@@ -19,6 +19,7 @@ package com.android.contacts.quickcontact;
 import android.accounts.Account;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -690,6 +691,7 @@ public class QuickContactActivity extends ContactsActivity {
         super.onCreate(savedInstanceState);
 
         getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         processIntent(getIntent());
 
@@ -1830,11 +1832,17 @@ public class QuickContactActivity extends ContactsActivity {
             desiredStatusBarColor = Color.TRANSPARENT;
         }
         // Animate to the new color.
-        final ObjectAnimator animation = ObjectAnimator.ofInt(getWindow(), "statusBarColor",
+        final ObjectAnimator StatusBarAnimation = ObjectAnimator.ofInt(getWindow(), "statusBarColor",
                 getWindow().getStatusBarColor(), desiredStatusBarColor);
-        animation.setDuration(ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION);
-        animation.setEvaluator(new ArgbEvaluator());
-        animation.start();
+        final ObjectAnimator NavBarAnimation = ObjectAnimator.ofInt(getWindow(), "navigationBarColor",
+                getWindow().getNavigationBarColor(), desiredStatusBarColor);
+        StatusBarAnimation.setEvaluator(new ArgbEvaluator());
+        NavBarAnimation.setEvaluator(new ArgbEvaluator());
+
+        final AnimatorSet a = new AnimatorSet();
+        a.playTogether(StatusBarAnimation, NavBarAnimation);
+        a.setDuration(ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION);
+        a.start();
     }
 
     private int colorFromBitmap(Bitmap bitmap) {
